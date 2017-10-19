@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+        <meta charset="UTF-8">
+        <title>Bushfire impact prediction</title>
+
+    </head>
+<style>
+textarea {
+  resize: none;
+  outline: none;
+}
+
+.formfield * {
+  vertical-align: middle;
+}
+
+input[type=submit] {
+    width: 50%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+
+div {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+</style>
+
+<body>
+<div>
+    <center>
+        <h2>Make a verification for past bushfire</h2>
+        <label for="vyear">Year</label>
+        <select id="vyear" name="vyear">
+          <option value="2011">2011</option>
+          <option value="2012">2012</option>
+          <option value="2013">2013</option>
+          <option value="2014">2014</option>
+          <option value="2015">2015</option>
+          <option value="2016">2016</option>
+          <option value="2011">2017</option></select>
+        <label for="vstate">State</label>
+        <select id="vstate" name="vstate">
+          <option value="Victoria">Victoria</option>
+          <option value="New South Wales">New South Wales</option>
+          <option value="Queensland">Queensland</option>
+          <option value="South Australia">South Australia</option>
+          <option value="Tasmania">Tasmania</option>
+          <option value="Western Australia">Western Australia</option>
+          <option value="Northern Territory">Northern Territory</option>
+          <option value="Australian Capital Territory">Australian Capital Territory</option>
+          <option value="Other Territories">Other Territories</option>
+        </select>
+    <br>
+        <input id="vsubmit" type="submit" value="Make verification" onclick="verification();">
+    </center>
+</div>
+<br>
+<div>
+    <center>
+        <h2>Make a prediction for future bushfire</h2>
+        <label for="pyear">Year</label>
+        <select id="pyear" name="pyear">
+          <option value="2011">2018</option>
+          <option value="2012">2019</option>
+          <option value="2013">2020</option></select>
+        <label for="pstate">State</label>
+        <select id="pstate" name="pstate">
+          <option value="Victoria">Victoria</option>
+          <option value="New South Wales">New South Wales</option>
+          <option value="Queensland">Queensland</option>
+          <option value="South Australia">South Australia</option>
+          <option value="Tasmania">Tasmania</option>
+          <option value="Western Australia">Western Australia</option>
+          <option value="Queensland">Queensland</option>
+          <option value="Northern Territory">Northern Territory</option>
+          <option value="Australian Capital Territory">Australian Capital Territory</option>
+          <option value="Other Territories">Other Territories</option>
+        </select>
+    <br>
+        <input id="psubmit" type="submit" value="Make prediction" onclick="prediction();">
+    </center>
+</div>
+<br>
+<div>
+    <center>
+        <h2>Region's population information</h2>
+        <p class="formfield">
+            <label for="total">Total population:</label>
+            <textarea readonly id="total" rows="2"></textarea>
+            <label for="age">Average age:</label>
+            <textarea readonly id="age" rows="2"></textarea>
+            <label for="income">Average personal weekly income:</label>
+            <textarea readonly id="income" rows="2"></textarea>
+            <label for="density">Population density:</label>
+            <textarea readonly id="density" rows="2"></textarea>
+        </p>
+        <h2>Prediction results</h2>
+        <p class="formfield">
+            <label for="slight">Slight damage:</label>
+            <textarea readonly id="slight" rows="2"></textarea>
+            <label for="medium">Medium damage:</label>
+            <textarea readonly id="medium" rows="2"></textarea>
+            <label for="severe">Severe damage:</label>
+            <textarea readonly id="severe" rows="2"></textarea>
+        </p>
+    </center>
+</div>
+</body>
+</html>
+
+<script>
+    function verification(){
+        var data;
+        data = {
+            'year': $('#vyear').find(":selected").text(),
+            'region': $('#vstate').find(":selected").text(),
+        };
+        $.ajax({
+            dataType: "json",
+            url: "what.json",
+            data: data,
+            success: function(data){
+                $('#slight').val(data['Slight']),
+                $('#medium').val(data['Medium']),
+                $('#severe').val(data['Severe']),
+                $('#total').val(data['Population']),
+                $('#age').val(data['Age']),
+                $('#income').val(data['Income']),
+                $('#density').val(data['Density']);
+                alert("We use real population data for this state in this year!");
+                if (data['Slight'] > data['Medium'] && data['Slight'] > data['Severe']) {
+                    alert("Such bushfire is most likely to have a Slight impact!");
+                };
+                if (data['Medium'] > data['Slight'] && data['Medium'] > data['Severe']) {
+                    alert("Such bushfire is most likely to have a Medium impact!");
+                };
+                if (data['Severe'] > data['Slight'] && data['Severe'] > data['Medium']) {
+                    alert("Such bushfire is most likely to have a Severe impact!");
+                };
+            },
+        });
+    }
+
+    function prediction(){
+        var data;
+        data = {
+            'year': $('#pyear').find(":selected").text(),
+            'region': $('#pstate').find(":selected").text(),
+        };
+        $.ajax({
+            dataType: "json",
+            url: "what.json",
+            data: data,
+            success: function(data){
+                $('#slight').val(data['Slight']),
+                $('#medium').val(data['Medium']),
+                $('#severe').val(data['Severe']),
+                $('#total').val(data['Population']),
+                $('#age').val(data['Age']),
+                $('#income').val(data['Income']),
+                $('#density').val(data['Density']);
+                alert("As you are making a prediction, the population data we use are simulated based on previous years!");
+                if (data['Slight'] > data['Medium'] && data['Slight'] > data['Severe']) {
+                    alert("Such bushfire is most likely to have a Slight impact!");
+                };
+                if (data['Medium'] > data['Slight'] && data['Medium'] > data['Severe']) {
+                    alert("Such bushfire is most likely to have a Medium impact!");
+                };
+                if (data['Severe'] > data['Slight'] && data['Severe'] > data['Medium']) {
+                    alert("Such bushfire is most likely to have a Severe impact!");
+                };
+            },
+        });
+    }
+</script>
